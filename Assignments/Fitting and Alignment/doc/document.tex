@@ -1,9 +1,8 @@
-\documentclass[11pt]{article}
+\documentclass[10pt]{article}
 
 \usepackage{geometry}
-\geometry{a4paper, margin=1in}
+\geometry{a4paper, margin=0.7in, top=0.55in, bottom=0.55in}
 
-%\usepackage{mathptmx}  % Times New Roman-like font
 \usepackage{titling}
 \usepackage{graphicx}
 \usepackage{hyperref}
@@ -13,84 +12,156 @@
 \usepackage{enumitem}
 \usepackage{subcaption}
 \usepackage{float}
-\usepackage{multicol}
-\usepackage{tikz}
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsfonts}
-\usetikzlibrary{shapes, arrows, positioning}
 \usepackage[justification=centering]{caption}
-%\usepackage{parskip}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.97,0.97,0.97}
 
 \lstset{
-	language=MATLAB,
-	basicstyle=\ttfamily\small,
-	keywordstyle=\color{blue},
-	commentstyle=\color{green!60!black},
-	stringstyle=\color{red},
-	showstringspaces=false,
-	frame=single, 
+	language=Python,
+	backgroundcolor=\color{backcolour},
+	commentstyle=\color{codegreen}\itshape,
+	keywordstyle=\color{blue}\bfseries,
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\ttfamily\scriptsize,
+	breakatwhitespace=false,
 	breaklines=true,
-	numbers=left,                   % Adds line numbers on the left
-	numberstyle=\tiny\color{gray},  % Makes the numbers small and gray
-	stepnumber=1                    % Numbers every single line
+	captionpos=b,
+	keepspaces=true,
+	numbers=left,
+	numbersep=5pt,
+	showspaces=false,
+	showstringspaces=false,
+	showtabs=false,
+	tabsize=2,
+	frame=single,
+	rulecolor=\color{gray!30}
 }
 
-
-\hypersetup{hidelinks}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=blue,
+	urlcolor=blue,
+	citecolor=blue
+}
 \urlstyle{same}
 
-
-% Institution, Department, Module, and Topic
-\newcommand{\institution}{University of Moratuwa}
-\newcommand{\faculty}{Faculty of Engineering}
-\newcommand{\department}{Department of Electronic and Telecommunication \\Engineering}
-\newcommand{\module}{EN3551}
-\newcommand{\moduleName}{Digital Signal Processing}
-\newcommand{\assignmentProject}{Fitting and Alignment}
-
-\newcommand{\tm}{\textsuperscript{TM}}
-\newcommand{\reg}{\textsuperscript{\textregistered}}
-
-\setlist[enumerate,1]{leftmargin=*, label=\arabic*.}   % Level 1: numbers
-\setlist[enumerate,2]{leftmargin=2em, label=--}        % Level 2: dashes
-\setlist[enumerate,3]{leftmargin=3.5em, label=\roman*.)} % Level 3: roman numerals
-
-
-
 \begin{document}
-	\definecolor{uomaccent}{HTML}{55499C}
+	\definecolor{uomaccent}{HTML}{4A3B8C}
 	
+	% Header
 	\begin{center}
-		\Large \textbf{EN3160: Image Processing and Machine Vision} \\
-		\vspace{0.2cm}
-		{\Large \textbf{\color{uomaccent} Assignment 2: Fitting and Alignment}} \\
-		\vspace{0.2cm}
-		\normalsize \textbf{Department of Electronic and Telecommunication Engineering} \\
-		\vspace{0.2cm}
-		\normalsize \textbf{University of Moratuwa}\\
-		\vspace{0.2cm}
-		\normalsize \textbf{October 19, 2026}
+		{\Large \textbf{EN3160: Image Processing and Machine Vision -- Assignment 2}} \\
+		\vspace{0.06cm}
+		{\large \textbf{\color{uomaccent} Fitting and Alignment}} \\
+		\vspace{0.06cm}
+		\footnotesize Department of Electronic and Telecommunication Engineering, University of Moratuwa $\;\vert\;$ October 2026
 	\end{center}
 	
-	\vspace{0.4cm}
+	\vspace{-0.15cm}
+	\noindent\begin{minipage}{0.48\textwidth}
+		\footnotesize \textbf{Name:} Samarasinghe S.M.R.R. \quad $\vert$ \quad \textbf{Index:} 230566U
+	\end{minipage}
+	\hfill
+	\begin{minipage}{0.48\textwidth}
+		\raggedleft\footnotesize
+		\textbf{GitHub:} \href{https://github.com/RumethRanhinda/EN3160-Vision-UoM/tree/main/Assignments/Fitting\%20and\%20Alignment}{RumethRanhinda/EN3160-Vision-UoM}
+	\end{minipage}
 	
-	\noindent\textbf{Name:} Samarasinghe S.M.R.R. \newline
-	\textbf{Index Number:} 230566U \newline
-	\textbf{GitHub Repository:} \href{https://github.com/RumethRanhinda/EN3160-Vision-UoM/tree/main/Assignments/Intensity\%20Transformations\%20and\%20Spatial\%20Filtering}{github.com/RumethRanhinda/EN3160-Vision-UoM}
-	
+	\vspace{0.05cm}
 	\noindent\rule{\textwidth}{0.5pt}
+	\vspace{0.1cm}
 	
-	\vspace{0.4cm}
+	\noindent\textbf{\large \color{uomaccent} 1. Blob Detection using Laplacian of Gaussians}
+	\vspace{0.1cm}
 	
-	\noindent\textbf{\color{uomaccent} 1. Task 1}
+	\noindent\textbf{1.1 Justification of Scale ($\sigma$) and Radius Parameters} \\
+	The image is loaded with \texttt{cv.IMREAD\_REDUCED\_COLOR\_4}, reducing its dimensions to 1/4th of its size ($360 \times 360$ pixels). In this resolution:
+	\begin{itemize}[leftmargin=*, nosep]
+		\item The smallest discernible sunflower centers in the background near the horizon span a radius of $r_{\min} \approx 2\text{--}3\text{ px}$. Since the scale-normalized LoG response peaks at $r = \sqrt{2}\sigma$, the lower scale bound is $\sigma_{\min} = r_{\min} / \sqrt{2} \approx 2 / \sqrt{2} \approx 1.50$. Meanwhile, The largest foreground sunflowers span a radius of $r_{\max} \approx 10\text{--}11.3\text{ px}$, yielding the upper scale bound $\sigma_{\max} = r_{\max} / \sqrt{2} \approx 11.31 / \sqrt{2} \approx 8.00$.
+		\item A geometric scale progression $\sigma_i = \sigma_{\min} k^i$ with $S = 20$ levels ($k = 1.092$) was chosen, spanning radii $r \in [2.12, 11.31]\text{ px}$ to provide uniform logarithmic coverage across scales.
+	\end{itemize}
+
+	\vspace{0.1cm}
+	\noindent\textbf{1.2 Methodology}
+	\begin{itemize}[leftmargin=*, nosep]
+		\item \textbf{Scale-Normalized LoG:} For each scale $\sigma_i$, the response $\sigma_i^2 \nabla^2(G_{\sigma_i} * I)$ is computed. Sunflower centers are dark circular disks against bright yellow petals, giving positive extremas.
+		\item \textbf{3D Extrema Detection:} Local maxima are detected in a $3 \times 3 \times 3$ spatio-scale volume. A point is marked as a blob if it is strictly greater than all 26 neighbors and exceeds contrast threshold $\tau = 0.10$. Scale boundaries are excluded.
+	\end{itemize}
+
+	\vspace{0.1cm}
+	\noindent\textbf{1.3 Important Code}
+	\vspace{-0.15cm}
+\begin{lstlisting}
+import cv2, numpy as np, scipy.ndimage as ndi
+
+# 1. Scale-space generation using scale-normalized LoG
+sigmas = np.geomspace(1.5, 8.0, 20)  # Justified sigma range
+scale_space = np.zeros((len(sigmas), *gray.shape))
+for i, s in enumerate(sigmas):
+    scale_space[i] = (s ** 2) * ndi.gaussian_laplace(gray, sigma=s)
+
+# 2. 3D Non-Maximum Suppression across (scale, y, x)
+max_vol = ndi.maximum_filter(scale_space, footprint=np.ones((3, 3, 3)), mode='constant')
+peaks = (scale_space == max_vol) & (scale_space > 0.10)
+peaks[[0, -1], :, :] = False  # Exclude scale boundary slices
+
+# 3. Extract circle parameters: center (x, y) and radius r = sqrt(2) * sigma
+blobs = []
+for s_idx, y, x in np.argwhere(peaks):
+    if 0 < x < gray.shape[1] - 1 and 0 < y < gray.shape[0] - 1:
+        s = sigmas[s_idx]
+        blobs.append({'center': (float(x), float(y)), 'r': np.sqrt(2)*s,
+                      'sigma': s, 'score': scale_space[s_idx, y, x]})
+\end{lstlisting}
 	
-	
-	
-	
-	
-	
-	
+	\noindent\textbf{1.4 Results}
+	\vspace{-0.25cm}
+	\begin{figure}[H]
+		\centering
+		\begin{minipage}[c]{0.5\textwidth}
+			\centering
+			\includegraphics[width=\linewidth, keepaspectratio]{Images/task1_detected_circles.png}
+			\captionof{figure}{Detected circles (yellow) with top 5 largest circles highlighted (red).}
+			\label{fig:task1_detections}
+		\end{minipage}
+		\hfill
+		\begin{minipage}[c]{0.47\textwidth}
+			\centering
+			\scriptsize
+			\setlength{\tabcolsep}{3pt}
+			\begin{tabular}{ccccc}
+				\toprule
+				\textbf{Rank} & \textbf{Center $(x, y)$} & \textbf{Radius $r$ (px)} & \textbf{Scale $\sigma$} & \textbf{LoG Resp.} \\
+				\midrule
+				1 & $(152.0, 254.0)$ & $10.36$ & $7.33$ & $0.1328$ \\
+				2 & $(282.0, 338.0)$ & $10.36$ & $7.33$ & $0.3492$ \\
+				3 & $(254.0, 174.0)$ & $9.49$ & $6.71$ & $0.2398$ \\
+				4 & $(310.0, 174.0)$ & $9.49$ & $6.71$ & $0.1760$ \\
+				5 & $(79.0, 258.0)$ & $9.49$ & $6.71$ & $0.1777$ \\
+				\bottomrule
+			\end{tabular}
+			\captionof{table}{Parameters of the 5 largest detected circles.}
+			\label{tab:largest_circles}
+			\vspace{0.25cm}
+			\normalsize
+			\raggedright
+			\footnotesize
+			\textbf{Summary of Results:}
+			\begin{itemize}[leftmargin=*, nosep]
+				\item \textbf{Range of $\sigma$ Values Used:} $\sigma \in [1.50, 8.00]$ across 20 geometrically spaced levels ($k = 1.092$), covering radii from $2.12\text{ px}$ to $11.31\text{ px}$.
+				\item \textbf{Parameters of Largest Circles:} Reported in Table \ref{tab:largest_circles}. Restricting $\sigma_{\max} = 8.00$ isolates individual flower heads (e.g., $r = 10.36\text{ px}$ at $(282.0, 338.0)$) without over-merging into background trees.
+				\item \textbf{Total Detections:} A total of 314 blobs were detected across the image, successfully marking sunflower centers from the distant field to the foreground.
+			\end{itemize}
+		\end{minipage}
+	\end{figure}
+
 \end{document}
