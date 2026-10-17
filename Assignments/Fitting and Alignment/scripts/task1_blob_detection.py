@@ -102,6 +102,4 @@ if __name__ == "__main__":
     ax.set_title("Detected Sunflowers using Scale-Space LoG (Yellow=All, Red=Largest)", fontsize=11)
     ax.axis("off")
     plt.tight_layout()
-    plt.savefig("doc/Images/task1_detected_circles.png", dpi=200, bbox_inches="tight")
-    plt.close()
-    print("Saved visualization to doc/Images/task1_detected_circles.png")
+    plt.show()

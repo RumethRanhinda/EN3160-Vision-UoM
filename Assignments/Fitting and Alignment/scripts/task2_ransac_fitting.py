@@ -126,7 +126,6 @@ def ransac_circle(X_remnant, thresh=1.5, max_iters=2000, min_consensus=30):
 
 def main():
     X, X_circ, X_line, gt_circ, gt_line = generate_noisy_data(seed=0)
-    os.makedirs("doc/Images", exist_ok=True)
 
     # 1. Fit line with RANSAC
     thresh_line = 2.0  # 2 * sigma_line (sigma_line = 1.0)
@@ -204,11 +203,7 @@ def main():
     ax.grid(True, linestyle=":", alpha=0.5)
     ax.legend(loc="upper right", fontsize=8.5, framealpha=0.9)
     plt.tight_layout()
-
-    out_fig = "doc/Images/task2_ransac_fitting.png"
-    plt.savefig(out_fig, dpi=200, bbox_inches="tight")
-    plt.close()
-    print(f"Saved figure to {out_fig}")
+    plt.show()
 
 
 if __name__ == "__main__":
