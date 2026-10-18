@@ -29,6 +29,27 @@ def generate_noisy_data(seed=0):
     return X, X_circ, X_line, gt_circle, gt_line
 
 
+def plot_generated_points(X, X_line, X_circ, gt_circ, gt_line):
+    """Plot noisy points conforming to line and circle (Listing 1)."""
+    fig, ax = plt.subplots(figsize=(6.5, 6.5))
+    ax.scatter(X_line[:, 0], X_line[:, 1], color='#1f77b4', label='Line points')
+    ax.scatter(X_circ[:, 0], X_circ[:, 1], color='#ff7f0e', label='Circle points')
+
+    circle_gt = plt.Circle((gt_circ[0], gt_circ[1]), gt_circ[2], color='g', fill=False, linewidth=1.5, label='Ground truth circle')
+    ax.add_patch(circle_gt)
+    ax.plot(gt_circ[0], gt_circ[1], '+', color='g', markersize=8)
+
+    x_vals = np.array([-15, 15])
+    ax.plot(x_vals, gt_line[0] * x_vals + gt_line[1], color='m', linewidth=1.5, label='Ground truth line')
+
+    ax.set_xlim(-15, 15); ax.set_ylim(-13, 17); ax.set_aspect('equal')
+    ax.grid(True, linestyle=':', alpha=0.5)
+    ax.legend(loc='upper right', fontsize=8.5)
+    ax.set_title("Generated Noisy Point Set Conforming to Line and Circle", fontsize=10.5, pad=6)
+    plt.tight_layout()
+    plt.show()
+
+
 def fit_line_2pts(p1, p2):
     """Estimates line parameters [a, b, d] from 2 points with ||[a, b]|| = 1."""
     dx = p2[0] - p1[0]
@@ -127,6 +148,9 @@ def ransac_circle(X_remnant, thresh=1.5, max_iters=2000, min_consensus=30):
 def main():
     X, X_circ, X_line, gt_circ, gt_line = generate_noisy_data(seed=0)
 
+    # 0. Plot initial point set
+    plot_generated_points(X, X_line, X_circ, gt_circ, gt_line)
+
     # 1. Fit line with RANSAC
     thresh_line = 2.0  # 2 * sigma_line (sigma_line = 1.0)
     best_fit_line, sample_line_model, sample_line_idx, line_inliers = ransac_line(
@@ -202,6 +226,7 @@ def main():
     ax.set_aspect("equal")
     ax.grid(True, linestyle=":", alpha=0.5)
     ax.legend(loc="upper right", fontsize=8.5, framealpha=0.9)
+    ax.set_title("Line and Circle Fitting using RANSAC (Figure 1 Replication)", fontsize=10.5, pad=6)
     plt.tight_layout()
     plt.show()
 
